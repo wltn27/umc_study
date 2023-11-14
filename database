@@ -1,0 +1,168 @@
+CREATE DATABASE `umc` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE UMC_DATABASE;  /*add*/
+
+-- umc.`member` definition
+
+CREATE TABLE `member` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  `gender` varchar(10) NOT NULL,
+  `age` int NOT NULL,
+  `address` varchar(40) NOT NULL,
+  `spec_address` varchar(40) NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `inactive_date` datetime(6) NOT NULL,
+  `social_type` varchar(10) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `email` varchar(50) NOT NULL,
+  `point` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.food_category definition
+
+CREATE TABLE `food_category` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(15) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.region definition
+
+CREATE TABLE `region` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.terms definition
+
+CREATE TABLE `terms` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `title` varchar(20) NOT NULL,
+  `body` text NOT NULL,
+  `optional` tinyint(1) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.member_prefer definition
+
+CREATE TABLE `member_prefer` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `member_id` bigint NOT NULL,
+  `category_id` bigint NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `member_prefer_FK` (`member_id`),
+  KEY `member_prefer_FK_1` (`category_id`),
+  CONSTRAINT `member_prefer_FK` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
+  CONSTRAINT `member_prefer_FK_1` FOREIGN KEY (`category_id`) REFERENCES `food_category` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.store definition
+
+CREATE TABLE `store` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `region_id` bigint NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `address` varchar(50) NOT NULL,
+  `score` float NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `store_FK` (`region_id`),
+  CONSTRAINT `store_FK` FOREIGN KEY (`region_id`) REFERENCES `region` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.member_agree definition
+
+CREATE TABLE `member_agree` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `member_id` bigint NOT NULL,
+  `terms_id` bigint NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `member_agree_FK` (`member_id`),
+  KEY `member_agree_FK_1` (`terms_id`),
+  CONSTRAINT `member_agree_FK` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
+  CONSTRAINT `member_agree_FK_1` FOREIGN KEY (`terms_id`) REFERENCES `terms` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.mission definition
+
+CREATE TABLE `mission` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `store_id` bigint NOT NULL,
+  `reward` int NOT NULL,
+  `deadline` datetime NOT NULL,
+  `mission_spec` text NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `mission_FK` (`store_id`),
+  CONSTRAINT `mission_FK` FOREIGN KEY (`store_id`) REFERENCES `store` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.review definition
+
+CREATE TABLE `review` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `member_id` bigint NOT NULL,
+  `store_id` bigint NOT NULL,
+  `body` text NOT NULL,
+  `score` float NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `review_FK` (`member_id`),
+  KEY `review_FK_1` (`store_id`),
+  CONSTRAINT `review_FK` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
+  CONSTRAINT `review_FK_1` FOREIGN KEY (`store_id`) REFERENCES `store` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.review_image definition
+
+CREATE TABLE `review_image` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `review_id` bigint NOT NULL,
+  `image_url` text NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `review_image_FK` (`review_id`),
+  CONSTRAINT `review_image_FK` FOREIGN KEY (`review_id`) REFERENCES `review` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- umc.member_mission definition
+
+CREATE TABLE `member_mission` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `member_id` bigint NOT NULL,
+  `mission_id` bigint NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  KEY `member_mission_FK` (`member_id`),
+  KEY `member_mission_FK_1` (`mission_id`),
+  CONSTRAINT `member_mission_FK` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
+  CONSTRAINT `member_mission_FK_1` FOREIGN KEY (`mission_id`) REFERENCES `mission` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
